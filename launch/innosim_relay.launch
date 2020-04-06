@@ -1,0 +1,14 @@
+<launch>
+	<!-- vim: set ft=xml noet : -->
+	<!-- Innopolis simulator relay launch script -->
+
+    <remap from="/mavros/global_position/global" to="/sim/gps_position"/>
+
+    <include file="$(find mavros)/launch/px4.launch">
+		<arg name="fcu_url" value="udp://:14540@127.0.0.1:14557" />
+    </include>
+
+    <node pkg="inno_sim_interface" type="innosim_relay_node.py" name="innosim_relay_node"/>
+
+
+</launch>

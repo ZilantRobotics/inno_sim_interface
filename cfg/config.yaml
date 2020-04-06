@@ -1,0 +1,30 @@
+initial_configuration:
+  map : InnopolisMain
+  time_of_day : 22.0
+  freeze_time_of_day  : true
+  # fog_intensity : 0.1
+  # rain_intensity : 0.6
+  # road_wetness : 0.5
+  # enable_traffic : true
+  # enable_pedestrian : true
+  # traffic_density : 300
+vehicles : 
+  - type : Vtol-S-Robo
+    address : localhost
+    port : 9090
+    command_type : twist
+    enable_lidar : true
+    enable_gps : true
+    enable_imu : true
+    enable_main_camera : true
+    enable_telephoto_camera : false
+    enable_sensor_effects : false
+    enable_high_quality_rendering : false
+    position : 
+      n : 4182779
+      e : 52880
+      h : 10.1
+    orientation : 
+      r : 0.0
+      p : 0.0
+      y : 220.0
