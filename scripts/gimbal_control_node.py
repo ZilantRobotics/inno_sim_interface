@@ -59,7 +59,7 @@ if __name__ == '__main__':
             msg.header.stamp = now
 
             msg.vector.x = 0.0 # math.degrees(roll)
-            msg.vector.y = 30.0 # math.degrees(pitch)
+            msg.vector.y = 90.0 # math.degrees(pitch)
             msg.vector.z = 90 - math.degrees(yaw)
 
             gimbal_angle_pub.publish(msg)

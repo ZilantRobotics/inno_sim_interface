@@ -3,6 +3,9 @@
 ![Sim](img/Sim.jpg)
 
 ## Innopolis Simulator UAV API
+
+Innopolis Simulator is currently used as visual renderer and source of simulated sensor data. Dynamics simulation and control is carried outside. API is adapted for such usage.
+
 Innopolis Simulator currently supports following API to control pose and actuators state of Innopolis VTOL UAV:
 
 ### To Simulator
@@ -37,6 +40,11 @@ Axes in Joy message have following meaning:
 Topic name is `/sim/gimbal_angle`.
 Topic type is `geometry_msgs/Vector3Stamped`.
 
+- `vector.x` is roll in deg, 
+- `vector.y` is pitch in deg, 
+- `vector.z` is yaw in deg.
+
+Roll, pitch and yaw values are global.
 
 ### From Simulator
 
@@ -44,12 +52,14 @@ Sim --> ROS
 
 #### Camera
 
-TODO
+Topic name is `/sim/camera/compressed`.
+Topic type is `sensor_msgs/CompressedImage`.
+
 
 #### LIDAR
 
-Topic name is /sim/velodyne_points.
-Topic type is sensor_msgs/PointCloud2.
+Topic name is `/sim/velodyne_points`.
+Topic type is `sensor_msgs/PointCloud2`.
 
 ## Installation
 Install PX4 and ROS according to [manual](https://dev.px4.io/master/en/setup/dev_env_linux_ubuntu.html) (`ubuntu_sim_ros_melodic.sh` bash script usage is recommended).
