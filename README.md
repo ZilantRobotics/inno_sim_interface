@@ -1,3 +1,10 @@
+# Download Innopolis Simulator
+
+Innopolis Simulator binaries are available here: https://github.com/inno-robolab/InnoSimulator
+This package is an example of usage Innopolis Simulator for visual renderer and sensors simulation in couple with Gazebo as UAV dynamics source. Our own dynamics simulation module for VTOL plane would be published soon.
+
+
+
 # Innopolis Simulator UAV Interface
 
 ![Sim](img/Sim.jpg)
