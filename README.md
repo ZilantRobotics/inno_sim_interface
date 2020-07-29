@@ -9,7 +9,7 @@ This package is an example of usage of Innopolis Simulator for visual rendering 
 
 # Innopolis Simulator UAV Interface
 
-![Sim](img/Sim.jpg)
+[![VTOL Plane Flight in InnoSimulator](img/Sim.jpg)](https://youtu.be/pXbG89qAtq0)
 
 ## Innopolis Simulator UAV API
 
