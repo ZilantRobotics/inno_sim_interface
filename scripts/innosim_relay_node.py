@@ -6,6 +6,9 @@ from nav_msgs.msg import Odometry
 from mavros_msgs.msg import RCOut
 from sensor_msgs.msg import Joy
 from sensor_msgs.msg import NavSatFix
+import tf2_ros
+import tf2_msgs
+import geometry_msgs
 
 attitude_pub = rospy.Publisher('/sim/attitude', QuaternionStamped, queue_size = 1)
 joy_pub = rospy.Publisher('/sim/actuators', Joy, queue_size = 1)
@@ -45,6 +48,24 @@ def odom_callback(data):
     q.header = data.header
     q.quaternion = data.pose.pose.orientation
     attitude_pub.publish(q)
+
+    # print(q.quaternion)
+    # print(data.pose.pose)
+    br = tf2_ros.TransformBroadcaster()
+    t = geometry_msgs.msg.TransformStamped()
+  
+    t.header.stamp = rospy.Time.now()
+    t.header.frame_id = "map"
+    t.child_frame_id = "base_link"
+    t.transform.translation = data.pose.pose.position
+    # t.transform.translation.y = msg.y
+    # t.transform.translation.z = 0.0
+    t.transform.rotation = data.pose.pose.orientation
+    # t.transform.rotation.y = q[1]
+    # t.transform.rotation.z = q[2]
+    # t.transform.rotation.w = q[3]
+   
+    br.sendTransform(t)
 
 def rc_callback(data):
     # PX4 SITL VTOL channels:

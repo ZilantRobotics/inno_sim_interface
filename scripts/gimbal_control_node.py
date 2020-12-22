@@ -51,7 +51,9 @@ if __name__ == '__main__':
         try:
             # listener.waitForTransform('/map', '/base_link', rospy.Time.now(), rospy.Duration(2.0))
             now = rospy.Time.now()
+            # print('wait transform')
             (trans,rot) = listener.lookupTransform('/map', '/base_link', rospy.Time(0))
+            # print('got transform map -> baselink')
             
             (roll, pitch, yaw) = tf.transformations.euler_from_quaternion(rot)
 
@@ -65,7 +67,7 @@ if __name__ == '__main__':
             gimbal_angle_pub.publish(msg)
 
             br.sendTransform(trans,
-                     tf.transformations.quaternion_from_euler(0, math.radians(30), yaw),
+                     tf.transformations.quaternion_from_euler(0, math.radians(90), yaw),
                      now,
                      "gimbal",
                      "map")
