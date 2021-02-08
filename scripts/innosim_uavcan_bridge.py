@@ -21,6 +21,8 @@ class InnoSimBridge:
         rospy.Subscriber('/uav/actuators', Joy, self.actuators_callback)
 
         self.gps_msg = NavSatFix()
+        self.joy = Joy()
+        self.joy.axes = [0] * 9
 
     def gps_callback(self, in_msg):
         self.gps_msg.header.stamp = in_msg.header.stamp
@@ -34,9 +36,9 @@ class InnoSimBridge:
         # So, at first we convert NED to baselink
         # After that we convert baselink to ENU
         q = Quaternion(w=msg.quaternion.w,
-                    x=msg.quaternion.x,
-                    y=msg.quaternion.y,
-                    z=msg.quaternion.z)
+                       x=msg.quaternion.x,
+                       y=msg.quaternion.y,
+                       z=msg.quaternion.z)
 
         q = NED_TO_ENU * q * FRD_FLU
 
@@ -48,35 +50,45 @@ class InnoSimBridge:
         self.attitude_pub.publish(msg)
 
     def actuators_callback(self, data):
-        # PX4 UAVCAN VTOL channels:
-        # 1 FR, ccw (0 - 8192)
-        # 2 RL, ccw
-        # 3 FL, cw
-        # 4 RR, cw
-        # 5 aileron (1000 - 2000)
-        # 6 elevator (0 -> 4096 -> 8192)
-        # 7 rudder
-        # 8 pusher (0 -> 8192)
-        FR_pwm = data.axes[0]
-        RL_pwm = data.axes[1]
-        FL_pwm = data.axes[2]
-        RR_pwm = data.axes[3]
-        pusher_pwm = data.axes[4]
-        aileron1_pwm = data.axes[5]
-        aileron2_pwm = data.axes[6]
-        elevator_pwm = data.axes[7]
+        MIXER_MIN_MAX = [
+            (0, 1), # 0. FR is normalized into [0, +1], where 0 means turn off
+            (0, 1), # 1. RL is normalized into [0, +1], where 0 means turn off
+            (0, 1), # 2. FL motor is normalized into [0, +1], where 0 means turn off
+            (0, 1), # 3. RR motor is normalized into [0, +1], where 0 means turn off
+            (0, 1), # 4. Aileron is normalized into [0, +1], where 0.5 is a middle position
+            (-1, 1),# 5. Elevator is normalized into [-1, +1], where 0 is a middle position
+            (-1, 1),# 6. Rudder is normalized into [-1, +1], where 0 is a middle position
+            (0, 1), # 7. Pusher is normalized into [0, +1], where 0 means turn off
+        ]
 
-        joy = Joy()
-        # Sim:
-        # FR, cw, rate, rpm (Front right motor speed)
-        # RL, cw, rate, rpm (Rear left motor speed)
-        # FL, ccw, rate, rpm (Front left motor speed)
-        # RR, ccw, rate, rpm (Rear right motor speed)
-        # aileron left, cw, deg
-        # aileron right, cw, deg
-        # elevator, cw, deg
-        # rudder, cw, deg
-        # thrust, pusher, rate, rpm
+        # 1. Clamp input data and convert it to the px4 control group format (from -1 to +1)
+        MIXER = [0] * 8
+        for idx in range(8):
+            MIXER[idx] = max(MIXER_MIN_MAX[idx][0], min(data.axes[idx], MIXER_MIN_MAX[idx][1]))
+        MIXER[4] = (MIXER[4] - 0.5) * 2
+
+        # 2. Convert them to the sim format
+        SIM_MAX_VALUES = [
+            15500,  # FR, cw, rate, rpm (Front right motor speed)
+            15500,  # RL, cw, rate, rpm (Rear left motor speed)
+            15500,  # FL, ccw, rate, rpm (Front left motor speed)
+            15500,  # RR, ccw, rate, rpm (Rear right motor speed)
+            70,     # aileron left, cw, deg
+            70,     # aileron right, cw, deg
+            70,     # elevator, cw, deg
+            70,     # rudder, cw, deg
+            15500   # thrust, pusher, rate, rpm
+        ]
+
+        for idx in range(4):
+            self.joy.axes[idx] = MIXER[idx] * SIM_MAX_VALUES[idx]
+        self.joy.axes[4] = MIXER[4] * SIM_MAX_VALUES[4]
+        self.joy.axes[5] = -MIXER[4] * SIM_MAX_VALUES[5]
+        self.joy.axes[6] = MIXER[5] * SIM_MAX_VALUES[6]
+        self.joy.axes[7] = MIXER[6] * SIM_MAX_VALUES[7]
+        self.joy.axes[8] = MIXER[7] * SIM_MAX_VALUES[8]
+
+        self.joy_pub.publish(self.joy)
 
 
 if __name__ == '__main__':
