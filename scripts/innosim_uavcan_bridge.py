@@ -4,7 +4,7 @@ import rospy
 from sensor_msgs.msg import NavSatFix
 from geometry_msgs.msg import QuaternionStamped
 from sensor_msgs.msg import Joy
-from drone_communicators.msg import Fix
+from uavcan_msgs.msg import Fix
 from pyquaternion import Quaternion
 
 FRD_FLU = Quaternion(w=0, x=1, y=0, z=0)
