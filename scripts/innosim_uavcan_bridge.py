@@ -49,7 +49,17 @@ class InnoSimBridge:
 
         self.attitude_pub.publish(msg)
 
-    def actuators_callback(self, data):
+    def actuators_callback(self, actuators):
+        try:
+            if len(actuators.axes) < 4:
+                rospy.logerr_throttle(5, "InnosimUavcanBridge: wrong actuators msg len(axes) < 4")
+                return
+            elif len(actuators.axes) != 8:
+                rospy.logwarn_throttle(5, "InnosimUavcanBridge: wrong airframe. Let it be MC.")
+        except:
+            rospy.logerr_throttle(5, "InnosimUavcanBridge: wrong actuators msg. There is no axes")
+            return
+
         MIXER_MIN_MAX = [
             (0, 1), # 0. FR is normalized into [0, +1], where 0 means turn off
             (0, 1), # 1. RL is normalized into [0, +1], where 0 means turn off
@@ -62,10 +72,11 @@ class InnoSimBridge:
         ]
 
         # 1. Clamp input data and convert it to the px4 control group format (from -1 to +1)
-        MIXER = [0] * 8
-        for idx in range(8):
-            MIXER[idx] = max(MIXER_MIN_MAX[idx][0], min(data.axes[idx], MIXER_MIN_MAX[idx][1]))
-        MIXER[4] = (MIXER[4] - 0.5) * 2
+        mixer = [0] * min(len(MIXER_MIN_MAX), len(actuators.axes))
+        for idx in range(len(mixer)):
+            mixer[idx] = max(MIXER_MIN_MAX[idx][0], min(actuators.axes[idx], MIXER_MIN_MAX[idx][1]))
+        if len(mixer) == 8:
+            mixer[4] = (mixer[4] - 0.5) * 2
 
         # 2. Convert them to the sim format
         SIM_MAX_VALUES = [
@@ -80,13 +91,14 @@ class InnoSimBridge:
             15500   # thrust, pusher, rate, rpm
         ]
 
-        for idx in range(4):
-            self.joy.axes[idx] = MIXER[idx] * SIM_MAX_VALUES[idx]
-        self.joy.axes[4] = MIXER[4] * SIM_MAX_VALUES[4]
-        self.joy.axes[5] = -MIXER[4] * SIM_MAX_VALUES[5]
-        self.joy.axes[6] = MIXER[5] * SIM_MAX_VALUES[6]
-        self.joy.axes[7] = MIXER[6] * SIM_MAX_VALUES[7]
-        self.joy.axes[8] = MIXER[7] * SIM_MAX_VALUES[8]
+        for idx in range(min(4, len(mixer))):
+            self.joy.axes[idx] = mixer[idx] * SIM_MAX_VALUES[idx]
+        if len(mixer) == 8:
+            self.joy.axes[4] = mixer[4] * SIM_MAX_VALUES[4]
+            self.joy.axes[5] = -mixer[4] * SIM_MAX_VALUES[5]
+            self.joy.axes[6] = mixer[5] * SIM_MAX_VALUES[6]
+            self.joy.axes[7] = mixer[6] * SIM_MAX_VALUES[7]
+            self.joy.axes[8] = mixer[7] * SIM_MAX_VALUES[8]
 
         self.joy_pub.publish(self.joy)
 
