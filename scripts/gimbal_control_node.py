@@ -4,7 +4,6 @@ import rospy
 import math
 import tf
 import geometry_msgs.msg
-import turtlesim.srv
 from sensor_msgs.msg import CameraInfo
 
 # https://github.com/carla-simulator/scenario_runner/blob/master/srunner/challenge/autoagents/ros_agent.py
