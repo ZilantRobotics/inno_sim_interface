@@ -1,0 +1,30 @@
+name: catkin_build
+
+on: [push]
+
+defaults:
+  run:
+    shell: bash
+jobs:
+  catkin_build:
+    runs-on: ubuntu-18.04
+    container:
+      image: ros:melodic
+    steps:
+      - name: Install basic requirement
+        run: |
+          apt-get update && apt-get upgrade -y
+      - run: apt-get install -y python-catkin-tools python-pip
+      - run: apt-get install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
+
+      - uses: actions/checkout@v2
+        with:
+          path: catkin_ws/src/inno-sim-interface
+
+      - name: Install inno-sim-interface requirements
+        run: |
+          ./catkin_ws/src/inno-sim-interface/scripts/install_requirements.sh
+
+      - name: catkin build
+        run: |
+          source /opt/ros/melodic/setup.bash && cd catkin_ws && catkin build
