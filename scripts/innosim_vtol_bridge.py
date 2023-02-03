@@ -1,10 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 from sensor_msgs.msg import NavSatFix
 from geometry_msgs.msg import QuaternionStamped
 from sensor_msgs.msg import Joy
-from uavcan_msgs.msg import Fix
 from pyquaternion import Quaternion
 
 FRD_FLU = Quaternion(w=0, x=1, y=0, z=0)
@@ -16,7 +15,7 @@ class InnoSimBridge:
         self.joy_pub = rospy.Publisher('/sim/actuators', Joy, queue_size = 1)
         self.gps_pub = rospy.Publisher('/sim/gps_position', NavSatFix, queue_size = 1)
 
-        rospy.Subscriber('/uav/gps_position', Fix, self.gps_callback)
+        rospy.Subscriber('/uav/gps_point', NavSatFix, self.gps_callback)
         rospy.Subscriber('/uav/attitude', QuaternionStamped, self.attitude_callback)
         rospy.Subscriber('/uav/actuators', Joy, self.actuators_callback)
 
@@ -26,9 +25,9 @@ class InnoSimBridge:
 
     def gps_callback(self, in_msg):
         self.gps_msg.header.stamp = in_msg.header.stamp
-        self.gps_msg.latitude = in_msg.latitude_deg_1e8 * 1e-08
-        self.gps_msg.longitude = in_msg.longitude_deg_1e8 * 1e-08
-        self.gps_msg.altitude = in_msg.height_msl_mm * 1e-03 + 6.5
+        self.gps_msg.latitude = in_msg.latitude * 1e-08
+        self.gps_msg.longitude = in_msg.longitude * 1e-08
+        self.gps_msg.altitude = in_msg.altitude * 1e-03 + 6.5
         self.gps_pub.publish(self.gps_msg)
 
     def attitude_callback(self, msg):
