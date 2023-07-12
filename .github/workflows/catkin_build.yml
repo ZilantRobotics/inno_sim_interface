@@ -7,7 +7,7 @@ defaults:
     shell: bash
 jobs:
   catkin_build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     container:
       image: ros:melodic
     steps:
