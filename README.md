@@ -1,27 +1,23 @@
-# Download Innopolis Simulator
+# Code-CT Innopolis 3d Simulator
 
-Innopolis Simulator binaries are available here: https://github.com/inno-robolab/InnoSimulator
+This package is an example of using the Code-CT Innopolis 3d Simulator 
+for visual rendering and sensor simulation in combination with a UAV dynamics source from ROS.
 
+# Code-CT Innopolis 3d Simulator Interface
 
-This package is an example of usage of Innopolis Simulator for visual rendering and sensors simulation in couple with Gazebo as UAV dynamics source. Our own dynamics simulation module for VTOL plane would be published soon.
+[![VTOL flight in InnoSimulator](img/Sim.jpg)](https://youtu.be/pXbG89qAtq0)
 
+## Code-CT Innopolis 3d Simulator UAV API
 
+Code-CT Innopolis 3d Simulator is currently used as a visual renderer and source of simulated sensor data. Dynamics simulation and control is done externally. The API is adapted for such use.
 
-# Innopolis Simulator UAV Interface
-
-[![VTOL Plane Flight in InnoSimulator](img/Sim.jpg)](https://youtu.be/pXbG89qAtq0)
-
-## Innopolis Simulator UAV API
-
-Innopolis Simulator is currently used as visual renderer and source of simulated sensor data. Dynamics simulation and control is carried outside. API is adapted for such usage.
-
-Innopolis Simulator currently supports following API to control pose and actuators state of Innopolis VTOL UAV:
+Code-CT Innopolis 3d Simulator currently supports the following API to control the pose and actuator state of a copter or VTOL aircraft UAV:
 
 ### To Simulator
 
 ROS --> Sim
 
-#### GPS Position
+#### GPS position
 Topic name is `/sim/gps_position`.
 Topic type is `sensor_msgs/NavSatFix`.
 
@@ -29,33 +25,33 @@ Topic type is `sensor_msgs/NavSatFix`.
 Topic name is `/sim/attitude`.
 Topic type is `geometry_msgs/QuaternionStamped`.
 
-#### Actuators State
+#### Actuators state
 Topic name is `/sim/actuators`.
 Topic type is `sensor_msgs/Joy`.
 
-Axes in Joy message have following meaning:
+The axes in the Joy message have the following meanings:
 
-1. FR, cw, rate, rpm (Front right motor speed)
-2. RL, cw, rate, rpm (Rear left motor speed)
-3. FL, ccw, rate, rpm (Front left motor speed)
-4. RR, ccw, rate, rpm (Rear right motor speed)
-5. aileron left, cw, deg
-6. aileron right, cw, deg
+1. FR, cw, rate, rpm (front right motor speed)
+2. RL, cw, rate, rpm (rear left motor speed)
+3. FL, ccw, rate, rpm (front left motor speed)
+4. RR, ccw, rate, rpm (rear right motor speed)
+5. left aileron, cw, deg
+6. right aileron, cw, deg
 7. elevator, cw, deg
 8. rudder, cw, deg
-9. thrust, pusher, rate, rpm
+9. thrust, throttle, rate, rpm
 
 #### Gimbal
 Topic name is `/sim/gimbal_angle`.
 Topic type is `geometry_msgs/Vector3Stamped`.
 
-- `vector.x` is roll in deg, 
-- `vector.y` is pitch in deg, 
-- `vector.z` is yaw in deg.
+- `vector.x` is roll in degrees, 
+- `vector.y` is pitch in degrees, 
+- `vector.z` is yaw in degrees.
 
-Roll, pitch and yaw values are global.
+The roll, pitch and yaw values are global.
 
-### From Simulator
+### From the 3d simulator
 
 Sim --> ROS
 
@@ -70,33 +66,6 @@ Topic type is `sensor_msgs/CompressedImage`.
 Topic name is `/sim/velodyne_points`.
 Topic type is `sensor_msgs/PointCloud2`.
 
-## Installation
-Install PX4 and ROS according to [manual](https://dev.px4.io/master/en/setup/dev_env_linux_ubuntu.html) (`ubuntu_sim_ros_melodic.sh` bash script usage is recommended).
+## Installation and startup
 
-Install `rosbridge` from LGSVL:
-
-```
-roscd
-cd ../src
-git clone https://github.com/lgsvl/rosbridge_suite.git
-catkin build
-sudo apt-get install ros-melodic-rosauth
-sudo apt-get install python-bson
-sudo apt-get install python-protobuf
-```
-
-
-
-## Launch with Gazebo (PX4 SITL)
-
-Run all:
-
-```
-roscd inno_sim_interface/scripts
-scripts/run_all.sh
-```
-
-Kill:
-
-`tmux kill-session -t innosim`
-
+Please refer to the main project repo: [innopolis_vtol_dynamics](https://github.com/RaccoonlabDev/innopolis_vtol_dynamics)
